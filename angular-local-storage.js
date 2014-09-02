@@ -132,15 +132,19 @@ angularLocalStorage.provider('localStorageService', function() {
       if (typeof value === "undefined") {
         value = null;
       }
+      
+      // Serialize objects regardless of storage method
+      if (angular.isObject(value) || angular.isArray(value)) {
+        value = angular.toJson(value);
+      }
 
+      // Try local storage
       try {
-        if (angular.isObject(value) || angular.isArray(value)) {
-          value = angular.toJson(value);
-        }
         if (webStorage) {webStorage.setItem(deriveQualifiedKey(key), value)};
         if (notify.setItem) {
           $rootScope.$broadcast('LocalStorageModule.notification.setitem', {key: key, newvalue: value, storageType: self.storageType});
         }
+      // Fallback to cookies
       } catch (e) {
         $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
         return addToCookies(key, value);

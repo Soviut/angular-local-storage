@@ -116,6 +116,7 @@ angularLocalStorage.provider('localStorageService', function() {
     // Example use: localStorageService.add('library','angular');
     var addToLocalStorage = function (key, value) {
 
+      var serializedValue = value;
       // Serialize objects regardless of storage method
       if (angular.isObject(value) || angular.isArray(value)) {
         serializedValue = angular.toJson(value);

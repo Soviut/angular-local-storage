@@ -116,6 +116,11 @@ angularLocalStorage.provider('localStorageService', function() {
     // Example use: localStorageService.add('library','angular');
     var addToLocalStorage = function (key, value) {
 
+      // Serialize objects regardless of storage method
+      if (angular.isObject(value) || angular.isArray(value)) {
+        serializedValue = angular.toJson(value);
+      }
+
       // If this browser does not support local storage use cookies
       if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
         if (!browserSupportsLocalStorage) {
@@ -125,29 +130,24 @@ angularLocalStorage.provider('localStorageService', function() {
         if (notify.setItem) {
           $rootScope.$broadcast('LocalStorageModule.notification.setitem', {key: key, newvalue: value, storageType: 'cookie'});
         }
-        return addToCookies(key, value);
+        return addToCookies(key, serializedValue);
       }
 
       // Let's convert undefined values to null to get the value consistent
       if (typeof value === "undefined") {
         value = null;
       }
-      
-      // Serialize objects regardless of storage method
-      if (angular.isObject(value) || angular.isArray(value)) {
-        value = angular.toJson(value);
-      }
 
       // Try local storage
       try {
-        if (webStorage) {webStorage.setItem(deriveQualifiedKey(key), value)};
+        if (webStorage) {webStorage.setItem(deriveQualifiedKey(key), serializedValue)};
         if (notify.setItem) {
           $rootScope.$broadcast('LocalStorageModule.notification.setitem', {key: key, newvalue: value, storageType: self.storageType});
         }
       // Fallback to cookies
       } catch (e) {
         $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
-        return addToCookies(key, value);
+        return addToCookies(key, serializedValue);
       }
       return true;
     };

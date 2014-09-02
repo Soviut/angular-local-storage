@@ -334,7 +334,7 @@ angularLocalStorage.provider('localStorageService', function() {
           thisCookie = thisCookie.substring(1,thisCookie.length);
         }
         if (thisCookie.indexOf(deriveQualifiedKey(key) + '=') === 0) {
-          return decodeURIComponent(thisCookie.substring(prefix.length + key.length + 1, thisCookie.length));
+          return angular.fromJSon(decodeURIComponent(thisCookie.substring(prefix.length + key.length + 1, thisCookie.length)));
         }
       }
       return null;
